@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Els esdeveniments de campanya i la intenció de vot · 29-N</title>
+<meta name="description" content="Anàlisi del tracking diari de 40dB per a les eleccions generals del 29-N de 2026. Català, castellano, English.">
+<style>
+  :root {
+    --bg: #fafaf9; --fg: #1c1c1a; --muted: #5f5f5a; --rule: #e2e2dd; --accent: #c2185b;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #161615; --fg: #ececea; --muted: #a3a39d; --rule: #33332f; --accent: #f06292; color-scheme: dark; }
+  }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font: 17px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 44rem; margin: 0 auto; padding: 4rem 1.25rem 3rem; }
+  h1 { font-size: 1.9rem; line-height: 1.2; margin: 0 0 .5rem; letter-spacing: -0.01em; }
+  .sub { color: var(--muted); margin: 0 0 2.5rem; }
+  ul { list-style: none; padding: 0; margin: 0 0 2.5rem; border-top: 1px solid var(--rule); }
+  li { border-bottom: 1px solid var(--rule); }
+  a.report { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem;
+             padding: 1.1rem 0; color: inherit; text-decoration: none; }
+  a.report:hover .t, a.report:focus-visible .t { color: var(--accent); }
+  .t { font-weight: 600; }
+  .lang { color: var(--muted); font-size: .9rem; white-space: nowrap; }
+  footer { color: var(--muted); font-size: .9rem; }
+  footer a { color: inherit; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Els esdeveniments de campanya i la intenció de vot</h1>
+  <p class="sub">Tracking diari de 40dB per a les eleccions generals del 29-N de 2026 · Jordi Muñoz i Claude</p>
+  <ul>
+    <li><a class="report" href="reports/informe_ca.html" hreflang="ca">
+      <span class="t">Els esdeveniments de campanya i la intenció de vot</span><span class="lang">Català</span></a></li>
+    <li><a class="report" href="reports/informe_es.html" hreflang="es">
+      <span class="t">Los eventos de campaña y la intención de voto</span><span class="lang">Castellano</span></a></li>
+    <li><a class="report" href="reports/report_en.html" hreflang="en">
+      <span class="t">Campaign events and vote intention</span><span class="lang">English</span></a></li>
+  </ul>
+  <footer>
+    Codi i metodologia / Código y metodología / Code and methods:
+    <a href="https://github.com/jordi-munoz/tracking-campanya">github.com/jordi-munoz/tracking-campanya</a>
+  </footer>
+</main>
+</body>
+</html>
