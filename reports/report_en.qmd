@@ -1,0 +1,188 @@
+---
+title: "Campaign events and vote intention"
+subtitle: "What 40dB's daily tracking poll tells us about the first week of the 29-N campaign"
+author:
+  - name: "Jordi Muñoz"
+  - name: "Claude"
+date: 2026-11-17
+lang: en-GB
+format:
+  html:
+    embed-resources: true
+    toc: true
+    toc-location: left
+    toc-title: "Contents"
+    number-sections: true
+    theme: cosmo
+    fig-dpi: 150
+    fig-align: center
+execute:
+  echo: false
+  warning: false
+  message: false
+bibliography: references.bib
+---
+
+```{r setup}
+lang <- "en"
+source(here::here("reports", "_common.R"))
+```
+
+[Versió en català](informe_ca.html) · [Versión en castellano](informe_es.html)
+
+## Summary {.unnumbered}
+
+The first week of the campaign for Spain's 29 November general election did little to move vote intention. Most of the events that dominated the news, such as the general strike over housing or the police charges against protesters, leave no visible trace in 40dB's daily polls.
+
+The exception is 13 November, the day the campaign officially began. That day Vox presented its manifesto, Santiago Abascal cancelled an interview with the YouTuber Jordi Wild at the last minute, and laSexta broadcast the first debate. Among respondents interviewed in the following days, Vox's vote intention is about `r ap("2026-11-13", "vi_vox")` points lower than among those interviewed in the preceding days, and the share who see Abascal as the best prime minister falls by about `r ap("2026-11-13", "bestpm_abascal")` points. The PP benefits: it wins back some of its 2023 voters who had moved to Vox. The fall in Vox support is sharper among young men.
+
+We cannot tell which of the 13 November events caused the shift, because they all happened on the same day. The daily polls only detect large changes, of four or five points; smaller effects go unnoticed. Details of the data, the method and all the checks are in the [technical annex](#annex).
+
+## What happened in the first week of the campaign
+
+News coverage tends to treat every campaign day as decisive: a debate, a gaffe or a cancelled interview is read as a turning point. Political science has traditionally been more sceptical. The prevailing view, as summarised by @shaw1999study, is that campaign events rarely have strong effects, because most voters pay little attention, decide on the basis of partisan cues and the state of the economy, and receive balanced information from rival campaigns. Shaw's own analysis of US presidential elections from 1952 to 1992 qualifies this view: some events, such as debates and conventions, produced significant and fairly durable shifts, while most had negligible or short-lived effects, and analysing them all together hides the ones that matter. The question, then, is which events in this campaign, if any, moved voters.
+
+### A stable campaign
+
+Every day 40dB interviews about 500 new people for *El País* and Cadena SER [@40db2026tracking]. On 17 November *El País* published its vote estimate under the headline ["Vox se frena y cede terreno al PP"](https://elpais.com/espana/elecciones-generales/2026-11-17/vox-se-frena-y-cede-terreno-al-pp.html) ("Vox stalls and loses ground to the PP") [@elpais2026vox]. Here we work with the individual survey responses: by comparing those given on successive days, we can see whether opinion moves after each event. @fig-series shows vote intention for the main parties in each daily sample, from the pre-election survey of 2–4 November to 16 November.
+
+```{r fig-series}
+#| fig-cap: "Direct vote intention (percentage of all respondents). Each point is a separate sample; the vertical line through each point shows the margin of error and the horizontal line the days on which interviews took place. Grey vertical lines mark days with relevant events."
+#| fig-width: 10
+#| fig-height: 6
+fig_series()
+```
+
+The lines move, but most of that movement is noise: with 500 interviews, an estimate of 20% has a margin of error of about 3.5 points either way. The PSOE, Frente Amplio and Podemos stay within that margin all week. The two movements that stand out are the fall in Vox support from 14 November, reaching a low of `r num(share("vi_vox", 4))`% on 14–15 November, and the rise of the PP, from `r num(share("vi_pp", 1))`% on 10–12 November to `r num(share("vi_pp", 5))`% on 15–16 November.
+
+### On 13 November, Vox loses ground and the PP wins voters back
+
+The campaign officially started on 13 November. Vox presented a manifesto centred on deporting migrants and "national priority" in access to housing. Abascal cancelled his scheduled interview with Jordi Wild a few hours before recording, while Sánchez, Feijóo and Colau did take part; the decision was criticised even by voices close to Vox. In the evening, laSexta broadcast the economic debate between spokespeople for the four main parties.
+
+@fig-dumbbell compares the 1,000 people interviewed between 10 and 12 November with the 1,000 interviewed between 14 and 16 November. Vox's vote intention falls from `r lvl("vi_vox", 1)`% to `r lvl("vi_vox", 4:5)`%, and the share who see Abascal as the best prime minister from `r lvl("bestpm_abascal", 1)`% to `r lvl("bestpm_abascal", 4:5)`%. The PP rises from `r lvl("vi_pp", 1)`% to `r lvl("vi_pp", 4:5)`%, and Feijóo as best prime minister from `r lvl("bestpm_feijoo", 1)`% to `r lvl("bestpm_feijoo", 4:5)`%. The fall for Vox and Abascal is large enough to rule out chance, and it holds under every alternative way of doing the calculation that we tried. The PP's gain is less certain. The PSOE and Sánchez also rise slightly, but within the margin of error.
+
+```{r fig-dumbbell}
+#| fig-cap: "Vote intention and preferred prime minister before and after 13 November (weighted percentages)."
+#| fig-width: 9
+#| fig-height: 3.2
+fig_dumbbell()
+```
+
+Who moved? Among those who say they voted PP in 2023, the share who would vote PP again rises from `r num(100 * flows$pre[flows$recall == "PP" & flows$intention == "PP"], 0)`% to `r num(100 * flows$post[flows$recall == "PP" & flows$intention == "PP"], 0)`%, and the share who now back Vox falls by about `r num(abs(flow("PP", "Vox")), 0)` points. Those who voted Vox in 2023 remain just as loyal. What we see, then, is PP voters who had drifted to Vox returning to the PP, not Vox losing its core.
+
+The fall is much steeper among men aged 18 to 34: Vox's vote intention in this group drops from `r lvl("vi_vox", 1, young_men)`% to `r lvl("vi_vox", 4:5, young_men)`%. This is what we would expect if cancelling the Jordi Wild interview, whose audience is mostly young and male, had hurt Abascal. The figure, however, rests on only about a hundred interviews in each period and should be read with caution.
+
+We cannot attribute the change to a single event. The campaign launch, the Vox manifesto, the cancelled interview and the laSexta debate all fell on the same day, and the data cannot separate them. Moreover, the 10–12 November sample already showed Vox slightly higher than the early-November survey; part of the fall may simply be a return to normal. Even allowing for this, the fall in Vox support remains, although it is smaller (about `r ap("2026-11-13", "vi_vox", "with_preelectoral")` points).
+
+### The general strike and the police charges do not move the vote
+
+The general strike over housing on 11 November, the police charges against protesters and Sánchez's backing for the Interior Minister, Fernando Grande-Marlaska, the following day could have pushed left-wing voters from the PSOE towards Frente Amplio or Podemos. We do not see this: among 2023 PSOE and Sumar voters, support for each party barely changes (less than one point). Here the only possible comparison is with the 2–4 November survey, conducted a week earlier with other events in between, so the conclusion is weaker. A small effect, of one or two points, would go undetected.
+
+### Hernani and the Canary Islands: too early to tell
+
+On 14 November a group of people attacked a PP information stand in Hernani, and that weekend saw a record number of migrant boat arrivals in the Canary Islands. On 15–16 November the PP is about `r ap("2026-11-14", "vi_pp")` points higher than before, but this rise cannot be separated from the one that had already begun on 13 November. Nor can we check whether the effect is larger in the Basque Country or the Canary Islands, because a single daily sample contains fewer than 30 interviews from each of those regions.
+
+### How to read these results
+
+These estimates compare different people interviewed on different days. They work as a natural experiment because every day 40dB interviews a fresh sample with the same quotas for sex, age, region and social class. We have checked that those interviewed before and after each event are alike in characteristics the event cannot have changed, such as education or employment status, and also in the vote they report having cast in 2023. Even so, three limitations apply. With 500 interviews a day, only changes of around four or five points can be detected. Events on the same day cannot be separated. And 3% of the interviews in 40dB's data are duplicates, which we have accounted for without any change in the results.
+
+The coming days of tracking will make it possible to assess the Sánchez–Feijóo head-to-head debate on 19 November and to see whether the fall in Vox support holds or reverses.
+
+## Technical annex {#annex}
+
+This section covers the data, the design, the diagnostic tests and the detailed estimates. The whole analysis can be reproduced with `Rscript run_all.R` from the project root, and the full tables are in `output/tables/`.
+
+### Data
+
+40dB publishes the tracking as cumulative files [@40db2026tracking]. The day-2 file contains the 1,000 interviews conducted on 10–12 November and 500 more from 12–13 November. Days 3 and 4 each add 500 interviews, and from day 5 the window rolls: the newest block enters and the oldest leaves. Because the identifier is renumbered and the weights recomputed in every file, we rebuilt the sample of unique interviews by matching each record's full response profile and position. Each file turns out to be exactly the previous one, minus the oldest blocks, with the new interviews appended at the end. The result is 3,000 unique interviews in five fieldwork blocks (@fig-timeline). We add 40dB's first pre-election survey (2–4 November, 2,000 interviews), which shares the vote questions with the tracking and serves as a pre-campaign reference [@40db2026pre]. All the data can be downloaded from the *El País* website: [pre-election survey](https://ep00.epimg.net/infografias/encuestas40db/2026/11-preelectoral/2026_11_preelectoral_descargables.zip), [day 2](https://ep00.epimg.net/infografias/encuestas40db/2026/11-tracking-electoral/40dB_tracking_dia02.zip), [day 3](https://ep00.epimg.net/infografias/encuestas40db/2026/11-tracking-electoral/40dB_tracking_dia03.zip), [day 4](https://ep00.epimg.net/infografias/encuestas40db/2026/11-tracking-electoral/40dB_tracking_dia04.zip), [day 5](https://ep00.epimg.net/infografias/encuestas40db/2026/11-tracking-electoral/40dB_tracking_dia05.zip).
+
+The data do not include the date or time of each interview. Each daily block spans two calendar days (for example, 13–14 November), so an event on 13 November may come before or after the interviews in blocks 2 and 3.
+
+```{r fig-timeline}
+#| fig-cap: "Fieldwork blocks and events. Each bar is an independent sample block; points mark events by whether they were unexpected, scheduled or mixed (see @tbl-events)."
+#| fig-width: 9
+#| fig-height: 4
+fig_timeline()
+```
+
+40dB uses quotas for sex by age, autonomous community, municipality size and social class. We weighted each block separately by raking to the same population margins, taken from the weighted day-4 file, so that comparisons across days do not depend on which file an interview comes from. The weights are only mildly dispersed (design effects between 1.02 and 1.06).
+
+We found `r n_dup_trk` tracking interviews that are exact copies of another one on all 31 variables (exact age, province, ten propensities to vote...), almost always on a different fieldwork day. Their share grows over time, reaching `r num(pct_dup_b5)`% of block 5. They are probably duplicated records or re-interviewed panellists. We keep them in the main analysis and drop them in a robustness check.
+
+### Design
+
+We follow the Unexpected Event during Surveys Design [UESD, @munoz2020], which compares respondents interviewed before and after an event. The causal interpretation rests on two assumptions. The first is **excludability**: the timing of the interview affects the outcome only through the event. In a campaign this is demanding, because there are several events every day, each triggers reactions (collateral events), and the vote may follow trends of its own. The second is **temporal ignorability**: the day of the interview must be independent of the potential outcomes. The tracking helps here, because each block is a fresh, complete quota sample, similar to a rolling cross-section [@johnston2002], but in an online panel those who respond on one day could differ from those who respond on another.
+
+Most campaign events are not unexpected in the strict UESD sense: debates, the campaign launch and manifestos were announced in advance, and their effects could be anticipated. We classify each event as unexpected, scheduled or mixed (@tbl-events).
+
+For each event day, a block is *pre* if it ended before that day and *post* if it started after it. Blocks containing the event day are excluded from the main estimate. Events on the same day are estimated jointly as an **event day**. The estimates are intention-to-treat (ITT) effects: we do not know who learned about each event, and the tracking has no most-important-problem question that would allow an indirect check of exposure.
+
+The main model is a weighted linear regression of each indicator on a *post* indicator, with HC2 standard errors and controls for the quota variables and education, all of them pre-treatment. Recalled 2023 vote is not included: it tends to drift towards current preference, so an event can shift it, which would introduce post-treatment bias [@montgomery2018]. We use it as a control in an alternative specification and as a placebo outcome. Up to 12 November there is no tracking block entirely before the events, and the *pre* group is the pre-election survey; these comparisons, across different surveys and with intervening events, are weaker. The *q*-values adjust for multiple comparisons within each specification [@benjamini1995].
+
+### Events
+
+```{r tbl-events}
+#| tbl-cap: "Events during fieldwork and comparison blocks. * Approximate date. The full list, with descriptions and sources, is in events/events_29N.csv."
+kable(tab_events())
+```
+
+10 and 11 November share comparison groups and have identical estimates. Events on 15 and 16 November do not yet have any later block.
+
+### Diagnostics
+
+```{r tbl-diag}
+#| tbl-cap: "Diagnostics by event day. Joint balance: Wald test of non-quota covariates and recalled vote as predictors of being interviewed after the event. Refusals and DK: post − pre difference in points (p-value). Power: probability of detecting a 5-point effect on Vox vote intention."
+kable(tab_diagnostics())
+```
+
+**Balance.** For every event day, no joint test of the non-quota covariates (education, employment status, children at home) and recalled vote is significant (@tbl-diag). For 13 November all standardised differences are below 0.1 (@fig-balance). Quota variables are balanced by construction once each block is weighted. The composition by recalled vote does not vary across the five tracking blocks (*F* = `r num(comp_F, 2)`, `r pval(comp_p)`), and only `r n_placebo_sig` of the `r n_placebo` placebo tests on recalled vote are significant at 5%, both in comparisons with the pre-election survey.
+
+```{r fig-balance}
+#| fig-cap: "Covariate balance between the pre (block 1) and post (blocks 4 and 5) groups for 13 November. The grey band marks standardised differences below 0.1."
+#| fig-width: 8
+#| fig-height: 6.5
+fig_balance()
+```
+
+**Item non-response.** The share refusing to state a vote intention is stable. The share who do not know whether they will vote rises slightly after 13 and 14 November (from about 1% to 2–3%).
+
+**Pre-period stability.** The placebo test of splitting the control group at the median day is not possible, because block 1 has no individual dates. Instead, we compare block 1 with the pre-election survey: the difference for Vox is `r prestab_pts("vi_vox")`, not significant but in the direction that could inflate the later fall.
+
+**Power.** The minimum detectable effect at 80% power for Vox vote intention is `r num(mde("2026-11-13"))` points for 13 November and `r num(mde("2026-11-14"))` for 14 November. No omnibus test of differences across the five tracking blocks survives the multiple-comparison adjustment (minimum *q* = `r num(omni_min_q, 2)`; unadjusted, Vox `r pval(omni_p("vi_vox"))` and Abascal as best prime minister `r pval(omni_p("bestpm_abascal"))`).
+
+### Detailed results
+
+```{r fig-events}
+#| fig-cap: "Post − pre differences by event day (main specification). For 11 and 12 November the pre group is the pre-election survey; for 13 and 14 November, the tracking blocks before the event. Magenta: indicators with a prior hypothesis; blue: placebos."
+#| fig-width: 11
+#| fig-height: 6.5
+fig_events()
+```
+
+```{r tbl-13nov}
+#| tbl-cap: "13 November: differences between respondents interviewed on 14–16 and on 10–12 November. Pre: percentage in block 1. Weighted linear regression with quota and education controls; HC2 errors; q: Benjamini-Hochberg values."
+kable(tab_13nov())
+```
+
+The fall for Abascal as best prime minister (`r pts_q("2026-11-13", "bestpm_abascal")`) is the only estimate with a *q*-value close to 0.05. The estimate for Vox is `r pts_q("2026-11-13", "vi_vox")` and for the PP `r pts_q("2026-11-13", "vi_pp")`. The falls for Vox and Abascal are significant in all eight specifications in @fig-robust. When blocks containing 13 November are treated as post, the effect on Vox shrinks to `r pts("2026-11-13", "vi_vox", "during_as_post")`, and with the pre-election survey added to the *pre* group it is `r pts("2026-11-13", "vi_vox", "with_preelectoral")`. The PP's gain is significant in four of the eight specifications.
+
+```{r fig-robust}
+#| fig-cap: "Robustness of the 13 November estimates. For each specification the label shows the pre/post group sizes and, for window variations, the power to detect a 5-point effect."
+#| fig-width: 10
+#| fig-height: 6.5
+fig_robust()
+```
+
+**Heterogeneity.** @fig-het shows effects in groups defined before estimation. Among men aged 18 to 34, the difference in Vox vote intention on 13 November is `r het_pts("H2", "vi_vox")` (`r het_n("H2", "vi_vox")$n_group_pre` respondents pre and `r het_n("H2", "vi_vox")$n_group_post` post), concentrated mostly in block 4. Among 2023 PSOE and Sumar voters, the difference in Frente Amplio vote intention after the strike is `r het_pts("H1", "vi_fa")` and in PSOE vote intention `r het_pts("H1", "vi_psoe")`. For 14 November, the difference for the PP is `r pts("2026-11-14", "vi_pp")`, but the *pre* group includes blocks before 13 November and inherits that day's trend, a violation of excludability through a time trend [@munoz2020]. The regional falsification tests (H4 and H5) have fewer than 30 cases in the post group. Heterogeneity by recalled vote (H1, H3) and the vote flows should be read with caution, because the moderator could be affected by the treatment.
+
+```{r fig-het}
+#| fig-cap: "Effects in groups defined in advance. Group: post − pre difference within the group; Rest: outside the group; Difference: interaction."
+#| fig-width: 11
+#| fig-height: 9
+fig_het()
+```
+
+## References {.unnumbered}
+
+::: {#refs}
+:::

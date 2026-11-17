@@ -1,0 +1,30 @@
+# Data: original 40dB files and anything derived at respondent level are not
+# published. See data/README.md to download them.
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+*.zip
+*.dta
+*.sav
+
+# Copyrighted literature
+docs/*.pdf
+
+# R / RStudio / Positron
+.Rhistory
+.RData
+.Rproj.user/
+.Ruserdata
+.positron/
+
+# Quarto build artefacts
+.quarto/
+reports/*_files/
+reports/*.html.md
+/.luarc.json
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
