@@ -25,10 +25,15 @@ dir_fig    <- here("output", "figures")
 dir_tab    <- here("output", "tables")
 for (d in c(dir_proc, dir_fig, dir_tab)) dir.create(d, showWarnings = FALSE, recursive = TRUE)
 
+source(here("R", "fieldwork.R"))
+
 blocks <- read_csv(here("config", "fieldwork_blocks.csv"), show_col_types = FALSE) |>
   mutate(mid = start + (end - start) / 2)
 
-events <- read_csv(here("events", "events_29N.csv"), show_col_types = FALSE)
+# Each event's phase (before, between surveys, during fieldwork, after the data)
+# is derived from the block dates, so new tracking days pull in later events.
+events <- read_csv(here("events", "events_29N.csv"), show_col_types = FALSE) |>
+  mutate(phase = event_phase(date, blocks))
 
 # Codings ---------------------------------------------------------------
 # Vote intention (p2) / sympathy (p3) codes, identical in tracking and preelectoral.

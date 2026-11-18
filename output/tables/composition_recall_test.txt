@@ -2,5 +2,5 @@
 	Pearson's X^2: Rao & Scott adjustment
 
 data:  svychisq(~recall + block, trk_des, statistic = "F")
-F = 0.62477, ndf = 23.969, ddf = 71883.663, p-value = 0.9207
+F = 0.65758, ndf = 29.961, ddf = 104833.690, p-value = 0.9233
 

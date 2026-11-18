@@ -21,9 +21,19 @@ het       <- tab("heterogeneity_hypotheses.csv")
 omnibus   <- tab("omnibus_block_differences.csv")
 flows     <- tab("vote_flows_13nov.csv")
 comp_test <- readLines(file.path(root, "output", "tables", "composition_recall_test.txt"))
+source(file.path(root, "R", "fieldwork.R"))
 blocks    <- read_csv(file.path(root, "config", "fieldwork_blocks.csv"), show_col_types = FALSE)
-events    <- read_csv(file.path(root, "events", "events_29N.csv"), show_col_types = FALSE)
+events    <- read_csv(file.path(root, "events", "events_29N.csv"), show_col_types = FALSE) |>
+  mutate(phase = event_phase(date, blocks))
 resp      <- read_rds(file.path(root, "data", "processed", "respondents.rds"))
+
+# Fieldwork extent, so text and figures follow whatever blocks are configured.
+last_block <- max(blocks$block)
+last_end   <- max(blocks$end)
+post13     <- blocks$block[blocks$start > as.Date("2026-11-13")]   # blocks after 13 Nov
+n_trk      <- sum(resp$survey == "tracking")
+n_trk_blocks <- sum(blocks$survey == "tracking")
+day_last   <- as.integer(format(last_end, "%d"))
 
 # Translations -------------------------------------------------------------
 L <- function(ca, es, en) switch(lang, ca = ca, es = es, en = en)
@@ -76,9 +86,12 @@ event_lab <- function(id) {
           E15 = "Rècord d'arribades de pasteres a Canàries",
           E16 = "Programa del PSOE; Sánchez titlla Abascal de 'racista'",
           E17 = "Lula a la Moncloa; programa de Frente Amplio; informe del CNI sobre Ceuta",
-          E18 = "Entrevista a Sánchez a Telecinco (Ceuta)", E19 = "Pujada de sou als funcionaris",
+          E18 = "Entrevista a Sánchez a Telecinco (Ceuta)", E19 = "Pujada de sou als funcionaris i del salari mínim",
           E20 = "Cara a cara Sánchez–Feijóo", E21 = "Inici de la prohibició de publicar enquestes",
-          E22 = "Debat a quatre", E23 = "Jornada electoral")
+          E22 = "Debat a quatre", E23 = "Jornada electoral",
+          E24 = "La dona d'Abascal cobra el bo social tèrmic",
+          E25 = "Entrevista a Feijóo al pòdcast El sentido de la birra",
+          E26 = "Entrevista a Sánchez a Antena 3", E27 = "Vaga de maquinistes (Semaf)")
   es <- c(E01 = "Convocatoria anticipada", E02 = "Accidente ferroviario de Urda",
           E03 = "Dimisión del ministro Puente", E04 = "Zapatero sigue investigado (Plus Ultra)",
           E05 = "Programa del PP", E06 = "Huelga general por la vivienda y cargas policiales",
@@ -91,9 +104,12 @@ event_lab <- function(id) {
           E15 = "Récord de llegadas de cayucos a Canarias",
           E16 = "Programa del PSOE; Sánchez llama 'racista' a Abascal",
           E17 = "Lula en la Moncloa; programa de Frente Amplio; informe del CNI sobre Ceuta",
-          E18 = "Entrevista a Sánchez en Telecinco (Ceuta)", E19 = "Subida de sueldo a los funcionarios",
+          E18 = "Entrevista a Sánchez en Telecinco (Ceuta)", E19 = "Subida de sueldo a los funcionarios y del salario mínimo",
           E20 = "Cara a cara Sánchez–Feijóo", E21 = "Inicio de la prohibición de publicar encuestas",
-          E22 = "Debate a cuatro", E23 = "Jornada electoral")
+          E22 = "Debate a cuatro", E23 = "Jornada electoral",
+          E24 = "La mujer de Abascal cobra el bono social térmico",
+          E25 = "Entrevista a Feijóo en el pódcast El sentido de la birra",
+          E26 = "Entrevista a Sánchez en Antena 3", E27 = "Huelga de maquinistas (Semaf)")
   en <- c(E01 = "Snap election called", E02 = "Urda rail crash",
           E03 = "Transport minister Puente resigns", E04 = "Zapatero remains under investigation (Plus Ultra)",
           E05 = "PP programme", E06 = "General strike on housing and police charges",
@@ -106,9 +122,15 @@ event_lab <- function(id) {
           E15 = "Record boat arrivals in the Canary Islands",
           E16 = "PSOE programme; Sánchez calls Abascal 'racist'",
           E17 = "Lula at Moncloa; Frente Amplio programme; CNI report on Ceuta",
-          E18 = "Sánchez interview on Telecinco (Ceuta)", E19 = "Public-sector pay rise",
+          E18 = "Sánchez interview on Telecinco (Ceuta)", E19 = "Public-sector pay and minimum wage rises",
           E20 = "Sánchez–Feijóo head-to-head debate", E21 = "Poll publication ban begins",
-          E22 = "Four-way debate", E23 = "Election day")
+          E22 = "Four-way debate", E23 = "Election day",
+          E24 = "Abascal's wife receives a heating subsidy",
+          E25 = "Feijóo interview on the podcast El sentido de la birra",
+          E26 = "Sánchez interview on Antena 3", E27 = "Train drivers' strike (Semaf)")
+  if (any(is.na(L(ca, es, en)[id])))
+    stop("Add translations to event_lab() in reports/_common.R for: ",
+         paste(setdiff(id, names(en)), collapse = ", "))
   L(ca, es, en)[id]
 }
 
@@ -195,18 +217,19 @@ fig_timeline <- function() {
     group_by(date) |>
     mutate(k = row_number()) |>
     ungroup()
+  y_ev <- nrow(b) + 0.6   # event markers sit just above the top bar
   ggplot() +
     geom_vline(data = distinct(ev, date), aes(xintercept = date), colour = "grey88") +
     geom_segment(data = b, aes(x = start, xend = end + 0.9, y = lab, yend = lab),
                  linewidth = 5, colour = "grey55", lineend = "butt") +
     geom_text(data = b, aes(x = end + 1.2, y = lab, label = n_lab), hjust = 0, size = 3, colour = "grey30") +
-    geom_point(data = ev, aes(x = date + 0.45, y = 6.6 + 0.45 * (k - 1), colour = expect), size = 2.6) +
-    geom_text(data = ev, aes(x = date + 0.75, y = 6.6 + 0.45 * (k - 1), label = event_id),
+    geom_point(data = ev, aes(x = date + 0.45, y = y_ev + 0.45 * (k - 1), colour = expect), size = 2.6) +
+    geom_text(data = ev, aes(x = date + 0.75, y = y_ev + 0.45 * (k - 1), label = event_id),
               hjust = 0, size = 2.7, colour = "grey20") +
     scale_colour_manual(values = setNames(c(accent, "grey55", "#1D84CE"),
                                           expect_lab(c("unexpected", "scheduled", "mixed"))),
                         name = NULL) +
-    scale_x_date(breaks = seq(as.Date("2026-11-02"), as.Date("2026-11-16"), by = 2),
+    scale_x_date(breaks = seq(as.Date("2026-11-02"), last_end, by = 2),
                  labels = fmt_short, expand = expansion(add = c(0.5, 2))) +
     scale_y_discrete(expand = expansion(add = c(0.6, 2.2))) +
     labs(x = NULL, y = NULL)
@@ -217,7 +240,7 @@ fig_series <- function() {
     filter(variable %in% c("vi_psoe", "vi_pp", "vi_vox", "vi_fa", "vi_podemos")) |>
     mutate(party = factor(c(vi_psoe = "PSOE", vi_pp = "PP", vi_vox = "Vox", vi_fa = "Frente Amplio",
                             vi_podemos = "Podemos")[variable], levels = names(party_cols)))
-  ev <- events |> filter(phase == "fieldwork", date <= as.Date("2026-11-16")) |> distinct(date)
+  ev <- events |> filter(phase == "fieldwork", date <= last_end) |> distinct(date)
   ggplot(vi, aes(mid, est * 100, colour = party)) +
     geom_vline(data = ev, aes(xintercept = date), colour = "grey88") +
     geom_errorbarh(aes(xmin = start, xmax = end), height = 0, linewidth = 0.3, alpha = 0.6) +
@@ -227,7 +250,7 @@ fig_series <- function() {
     facet_wrap(~party, scales = "free_y", ncol = 3) +
     scale_y_continuous(labels = \(x) num(x, 0)) +
     scale_colour_manual(values = party_cols, guide = "none") +
-    date_axis(seq(as.Date("2026-11-03"), as.Date("2026-11-15"), by = 3)) +
+    date_axis(seq(as.Date("2026-11-03"), last_end, by = 3)) +
     labs(x = NULL, y = L("% sobre el total d'enquestats (ponderat)", "% sobre el total de encuestados (ponderado)", "% of all respondents (weighted)"))
 }
 
@@ -235,7 +258,9 @@ main_outcomes <- c("vi_psoe", "vi_pp", "vi_vox", "vi_fa", "vi_podemos", "undecid
                    "bestpm_sanchez", "bestpm_feijoo", "bestpm_abascal", "bestpm_colau",
                    "rec_psoe", "rec_pp", "rec_vox", "rec_sumar", "rec_abst")
 
-fig_events <- function(dates = as.Date(c("2026-11-11", "2026-11-12", "2026-11-13", "2026-11-14"))) {
+# Event days shown in the detailed results figure: every analysed day from 11 Nov.
+fig_event_days <- sort(unique(primary$date[primary$date >= as.Date("2026-11-11")]))
+fig_events <- function(dates = fig_event_days) {
   d <- primary |>
     filter(date %in% dates, outcome %in% main_outcomes) |>
     mutate(day = paste0(fmt_short(date), "\n", str_replace_all(events, ", ", "·")),
@@ -252,7 +277,7 @@ fig_events <- function(dates = as.Date(c("2026-11-11", "2026-11-12", "2026-11-13
     geom_vline(xintercept = 0, colour = "grey60") +
     geom_linerange(aes(xmin = 100 * conf.low, xmax = 100 * conf.high), linewidth = 0.5) +
     geom_point(size = 1.8) +
-    facet_wrap(~day, nrow = 1) +
+    facet_wrap(~day, nrow = ceiling(length(dates) / 5)) +
     scale_colour_manual(values = cols, name = NULL) +
     scale_x_continuous(labels = \(x) num(x, 0)) +
     labs(x = L("Diferència post − pre (punts percentuals, IC 95%)", "Diferencia post − pre (puntos porcentuales, IC 95%)", "Post − pre difference (percentage points, 95% CI)"),
@@ -394,7 +419,10 @@ comp_txt <- paste(comp_test, collapse = " ")
 comp_F <- as.numeric(str_match(comp_txt, "F = ([0-9.]+)")[, 2])
 comp_p <- as.numeric(str_match(comp_txt, "p-value = ([0-9.]+)")[, 2])
 n_dup_trk   <- sum(resp$dup_copy & resp$survey == "tracking")
-pct_dup_b5  <- 100 * mean(resp$dup_copy[resp$block == 5])
+pct_dup_blk <- function(b) 100 * mean(resp$dup_copy[resp$block %in% b])
+pct_dup_late <- range(sapply(3:last_block, pct_dup_blk))   # blocks 3 onwards
+pct_dup_all <- 100 * mean(resp$dup_copy)
+n_placebo_days <- n_distinct(primary$date[primary$type == "placebo" & primary$p.value < 0.05])
 n_dup_pre   <- sum(resp$dup_any & resp$block == 0)
 omni_min_q  <- min(omnibus$q.value[!str_starts(omnibus$outcome, "rec_")])
 omni_p      <- function(o) omnibus$p.value[omnibus$outcome == o]
@@ -413,6 +441,11 @@ het_n <- function(h, outcome = NULL) {
 power_of <- function(date, spec = "tracking", outcome = "vi_vox", col = "power_5pp")
   bandw[[col]][bandw$date == as.Date(date) & bandw$spec == spec & bandw$outcome == outcome]
 mde <- function(date, outcome = "vi_vox") 100 * get_est(date, outcome)$mde80
+# Number of the eight specifications in which an estimate is significant at 5%.
+n_sig_specs <- function(date, outcome)
+  sum(allspecs$p.value[allspecs$date == as.Date(date) & allspecs$outcome == outcome] < 0.05)
+n_specs <- n_distinct(allspecs$spec)
+n_post13 <- sum(blocks$n[blocks$block %in% post13])
 
 # Plain-language helpers for the results section -----------------------------
 # Weighted level (%) of a variable in a set of blocks, optionally in a subgroup.
@@ -426,13 +459,13 @@ ap <- function(date, outcome, spec = NULL) num(abs(100 * get_est(date, outcome, 
 ap_het <- function(h, outcome) num(abs(100 * het$estimate[str_starts(het$hyp, h) & het$outcome == outcome &
                                                           het$contrast == "inside"]))
 
-# Before/after levels around 13 Nov: block 1 vs blocks 4-5 (weighted raw shares).
+# Before/after levels around 13 Nov: block 1 vs all later blocks (weighted raw shares).
 fig_dumbbell <- function() {
   ind <- c(vi_pp = "PP", vi_psoe = "PSOE", vi_vox = "Vox", vi_fa = "Frente Amplio",
            bestpm_feijoo = "PP", bestpm_sanchez = "PSOE", bestpm_abascal = "Vox", bestpm_colau = "Frente Amplio")
   lev <- function(v, b) 100 * weighted.mean(resp[[v]][resp$block %in% b], resp$w[resp$block %in% b], na.rm = TRUE)
   d <- tibble(var = names(ind), party = unname(ind)) |>
-    mutate(pre = map_dbl(var, lev, b = 1), post = map_dbl(var, lev, b = 4:5),
+    mutate(pre = map_dbl(var, lev, b = 1), post = map_dbl(var, lev, b = post13),
            panel = if_else(str_starts(var, "vi_"),
                            L("Intenció de vot (%)", "Intención de voto (%)", "Vote intention (%)"),
                            L("Millor president/a (%)", "Mejor presidente/a (%)", "Best prime minister (%)")),
@@ -451,6 +484,145 @@ fig_dumbbell <- function() {
     scale_colour_manual(values = party_cols, guide = "none") +
     scale_x_continuous(labels = \(x) num(x, 0), expand = expansion(add = 4)) +
     labs(x = NULL, y = NULL,
-         caption = L("Cercle buit: 10-12 de novembre (1.000 entrevistes). Fletxa: 14-16 de novembre (1.000 entrevistes).",
-                     "Círculo vacío: 10-12 de noviembre (1.000 entrevistas). Flecha: 14-16 de noviembre (1.000 entrevistas).", "Open circle: 10-12 November (1,000 interviews). Arrow: 14-16 November (1,000 interviews)."))
+         caption = L(sprintf("Cercle buit: 10-12 de novembre (1.000 entrevistes). Fletxa: 14-%s de novembre (%s entrevistes).", day_last, num(n_post13, 0)),
+                     sprintf("Círculo vacío: 10-12 de noviembre (1.000 entrevistas). Flecha: 14-%s de noviembre (%s entrevistas).", day_last, num(n_post13, 0)),
+                     sprintf("Open circle: 10-12 November (1,000 interviews). Arrow: 14-%s November (%s interviews).", day_last, num(n_post13, 0))))
+}
+
+# Text that follows the fieldwork calendar --------------------------------------
+# Date range in running text, e.g. "16–17 November" / "entre el 16 y el 17 de noviembre".
+range_txt <- function(start, end) {
+  if (start == end) return(fmt_date(end))
+  d1 <- as.integer(format(start, "%d"))
+  L(sprintf("entre el %d i el %s", d1, fmt_date(end)),
+    sprintf("entre el %d y el %s", d1, fmt_date(end)),
+    sprintf("%d–%s", d1, fmt_date(end)))
+}
+# List of days, e.g. "16 and 17 November" / "16 y 17 de noviembre".
+fmt_days <- function(dates) {
+  dates <- sort(unique(dates)); k <- length(dates)
+  if (k == 0) return("")
+  if (k == 1) return(fmt_date(dates))
+  first <- paste(as.integer(format(dates[-k], "%d")), collapse = ", ")
+  paste(first, L("i", "y", "and"), fmt_date(dates[k]))
+}
+# Tracking blocks entirely after an event day, and how to describe them.
+post_blocks <- function(date) blocks$block[blocks$survey == "tracking" & blocks$start > as.Date(date)]
+post_n      <- function(date) sum(blocks$n[blocks$block %in% post_blocks(date)])
+post_range  <- function(date) {
+  b <- blocks[blocks$block %in% post_blocks(date), ]
+  range_txt(min(b$start), max(b$end))
+}
+samples_txt <- function(date) {
+  k <- length(post_blocks(date))
+  if (k == 1) L("una sola mostra diària", "una sola muestra diaria", "a single daily sample")
+  else L(sprintf("només %d mostres diàries", k), sprintf("solo %d muestras diarias", k), sprintf("only %d daily samples", k))
+}
+# Fieldwork event days that do not yet have any later block.
+days_without_post <- function() {
+  d <- sort(unique(events$date[events$phase == "fieldwork"]))
+  d[vapply(d, function(x) length(post_blocks(x)) == 0, logical(1))]
+}
+# Markdown download links for every file in config/fieldwork_blocks.csv.
+data_links <- function() {
+  dirs <- unique(blocks$file_dir)
+  lab  <- ifelse(is.na(dir_day(dirs)), L("preelectoral", "preelectoral", "pre-election survey"),
+                 paste(L("dia", "día", "day"), dir_day(dirs)))
+  paste0("[", lab, "](", source_url(dirs), ")", collapse = ", ")
+}
+deff_range <- range(tapply(resp$w, resp$block, function(w) 1 + var(w)))
+# Largest number of interviews from the Basque Country/Navarre or the Canary
+# Islands in a single daily block (blocks 2 onwards; block 1 spans three days).
+max_region_n <- max(
+  table(resp$block[resp$block >= 2 & resp$ccaa %in% c("15", "16")]),
+  table(resp$block[resp$block >= 2 & resp$ccaa %in% "5"]))
+
+# Statements in the text that the data must still support ----------------------
+# The reports' numbers are computed, but some sentences describe the results in
+# words ("not significant", "the only estimates with q close to 0.05", "less than
+# one point"). Each such statement is listed here with the condition that makes
+# it true. When new data arrive, any statement that no longer holds stops the
+# render with a list of the paragraphs to revise. Set ALLOW_STALE_CLAIMS=1 to
+# render anyway (e.g. to look at a draft); reports/check_claims.R prints the
+# status without rendering. When you revise the text, update the matching row.
+report_claims <- function() {
+  d13 <- "2026-11-13"; d14 <- "2026-11-14"; d15 <- "2026-11-15"
+  e <- function(d, o, s = NULL) get_est(d, o, s)$estimate
+  p <- function(d, o, s = NULL) get_est(d, o, s)$p.value
+  q <- function(d, o) get_est(d, o)$q.value
+  lv <- function(v, b, cond = TRUE) {
+    keep <- resp$block %in% b & cond
+    weighted.mean(resp[[v]][keep], resp$w[keep], na.rm = TRUE)
+  }
+  trk_blocks <- blocks$block[blocks$survey == "tracking"]
+  sh <- function(v) setNames(sapply(trk_blocks, \(b) share(v, b)), trk_blocks)
+  core <- c("vi_psoe", "vi_pp", "vi_vox", "vi_fa", "vi_podemos", "undecided", "likely",
+            "bestpm_sanchez", "bestpm_feijoo", "bestpm_abascal", "bestpm_colau")
+  q13 <- primary |> filter(date == as.Date(d13), outcome %in% core)
+  het_in <- function(h, o) het$estimate[str_starts(het$hyp, h) & het$outcome == o & het$contrast == "inside"]
+  vox_ym <- sapply(post13, \(b) lv("vi_vox", b, young_men))
+  nr_post <- function(d, v) with(nonresp[nonresp$date == as.Date(d) & nonresp$variable == v, ], pre_mean + estimate)
+
+  tibble::tribble(
+    ~section, ~claim, ~ok,
+    "Summary; 13 Nov; Detailed results", "Vox and Abascal falls are significant in every specification",
+      n_sig_specs(d13, "vi_vox") == n_specs && n_sig_specs(d13, "bestpm_abascal") == n_specs,
+    "Summary; 13 Nov", "PP and PSOE gains are less robust than the Vox fall (not significant in every specification)",
+      n_sig_specs(d13, "vi_pp") < n_specs && n_sig_specs(d13, "vi_psoe") < n_specs,
+    "13 Nov", "Vox and Abascal fall, PP, Feijóo and PSOE rise (block 1 vs later blocks)",
+      lv("vi_vox", post13) < lv("vi_vox", 1) && lv("bestpm_abascal", post13) < lv("bestpm_abascal", 1) &&
+      lv("vi_pp", post13) > lv("vi_pp", 1) && lv("bestpm_feijoo", post13) > lv("bestpm_feijoo", 1) &&
+      lv("vi_psoe", post13) > lv("vi_psoe", 1),
+    "13 Nov", "PP gain significant in fewer than half the specifications ('less certain')",
+      n_sig_specs(d13, "vi_pp") < n_specs / 2,
+    "13 Nov", "PSOE gain: p < .05 in the main specification but q >= .05",
+      p(d13, "vi_psoe") < 0.05 && q(d13, "vi_psoe") >= 0.05,
+    "13 Nov", "Sánchez as best PM: rise within the margin of error (p >= .05)",
+      e(d13, "bestpm_sanchez") > 0 && p(d13, "bestpm_sanchez") >= 0.05,
+    "Detailed results", "Vox and Abascal are the only 13 Nov outcomes with q < 0.1 ('q close to 0.05')",
+      setequal(q13$outcome[q13$q.value < 0.1], c("vi_vox", "bestpm_abascal")),
+    "13 Nov (who moved)", "PP 2023 voters: loyalty to PP up, switching to Vox down; Vox 2023 voters as loyal as before (< 3 points)",
+      flow("PP", "PP") > 0 && flow("PP", "Vox") < 0 && abs(flow("Vox", "Vox")) < 3,
+    "Summary; 13 Nov", "Vox falls more among men aged 18-34 than overall",
+      het_in("H2", "vi_vox") < e(d13, "vi_vox"),
+    "Heterogeneity", "Young men's Vox fall is concentrated in block 4 (lowest post block)",
+      post13[which.min(vox_ym)] == 4,
+    "13 Nov; Diagnostics", "Block 1 vs pre-election survey: Vox slightly higher, not significant",
+      with(prestab[prestab$outcome == "vi_vox", ], estimate > 0 && p.value >= 0.05),
+    "A stable campaign", "Vox lowest in block 4 and below its block 1 level in every later block",
+      which.min(sh("vi_vox")) == which(trk_blocks == 4) && all(sh("vi_vox")[as.character(post13)] < share("vi_vox", 1)),
+    "A stable campaign", "PSOE reaches its highest figure in block 6",
+      names(which.max(sh("vi_psoe"))) == "6",
+    "A stable campaign", "Frente Amplio and Podemos stay within the margin of error (range < 3.5 points)",
+      diff(range(sh("vi_fa"))) < 3.5 && diff(range(sh("vi_podemos"))) < 3.5,
+    "Strike", "Among 2023 PSOE/Sumar voters, Frente Amplio and Podemos change by less than one point and the PSOE does not lose ground",
+      abs(het_in("H1", "vi_fa")) < 0.01 && abs(het_in("H1", "vi_podemos")) < 0.01 && het_in("H1", "vi_psoe") >= 0,
+    "Hernani", "14 Nov: PP higher than before but not significant",
+      e(d14, "vi_pp") > 0 && p(d14, "vi_pp") >= 0.05,
+    "15 Nov", "15 Nov: PSOE up and Vox down, neither significant after multiple-comparison correction",
+      e(d15, "vi_psoe") > 0 && e(d15, "vi_vox") < 0 && q(d15, "vi_psoe") >= 0.05 && q(d15, "vi_vox") >= 0.05,
+    "Summary; How to read", "Daily polls detect changes of about four or five points (MDE for Vox, 13-14 Nov)",
+      all(between(c(mde(d13), mde(d14)), 3.5, 5.5)),
+    "Diagnostics", "No joint balance test is significant; all 13 Nov standardised differences < 0.1",
+      all(balance$joint_p >= 0.05) && all(abs(balance$std_diff[balance$date == as.Date(d13)]) < 0.1),
+    "Diagnostics", "No placebo test is significant ('none of the placebo tests')",
+      n_placebo_sig == 0,
+    "Diagnostics", "Recall-vote composition does not vary across blocks",
+      comp_p >= 0.05,
+    "Diagnostics", "Refusals stable; DK on turnout rises to about 2-3% after 13 and 14 Nov",
+      all(nonresp$p.value[nonresp$variable == "nr_vote"] >= 0.05) &&
+      all(between(c(nr_post(d13, "dk_turnout"), nr_post(d14, "dk_turnout")), 0.015, 0.035)),
+    "Diagnostics", "No omnibus test survives multiple-comparison correction",
+      omni_min_q >= 0.05,
+    "Data", "Duplicate share grows over time (block 1 below every block from block 3)",
+      pct_dup_blk(1) < pct_dup_late[1]
+  )
+}
+claim_status <- report_claims()
+if (!all(claim_status$ok) && !identical(Sys.getenv("ALLOW_STALE_CLAIMS"), "1")) {
+  bad <- claim_status[!claim_status$ok, ]
+  stop("These statements in the report text no longer match the data:\n",
+       paste0("  - [", bad$section, "] ", bad$claim, collapse = "\n"),
+       "\nRevise the text (and the matching row in report_claims() in reports/_common.R), ",
+       "or set ALLOW_STALE_CLAIMS=1 to render a draft anyway.", call. = FALSE)
 }

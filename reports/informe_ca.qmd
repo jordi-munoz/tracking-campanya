@@ -4,7 +4,7 @@ subtitle: "Què ens diu el tracking diari de 40dB sobre la primera setmana de ca
 author:
   - name: "Jordi Muñoz"
   - name: "Claude"
-date: 2026-11-17
+date: today
 lang: ca
 format:
   html:
@@ -34,7 +34,7 @@ source(here::here("reports", "_common.R"))
 
 La primera setmana de campanya de les eleccions generals del 29 de novembre ha mogut poc la intenció de vot. La majoria d'esdeveniments que han ocupat els mitjans, com la vaga general per l'habitatge o les càrregues policials, no deixen cap rastre visible en les enquestes diàries de 40dB.
 
-L'excepció és el 13 de novembre, el dia que va començar oficialment la campanya. Aquell dia Vox va presentar el seu programa, Santiago Abascal va cancel·lar a última hora una entrevista amb el youtuber Jordi Wild i laSexta va emetre el primer debat. Entre els enquestats dels dies posteriors, Vox té uns `r ap("2026-11-13", "vi_vox")` punts menys d'intenció de vot que entre els dels dies anteriors, i la proporció que considera Abascal el millor president baixa uns `r ap("2026-11-13", "bestpm_abascal")` punts. El PP en surt beneficiat: recupera una part dels seus votants del 2023 que havien passat a Vox. La caiguda de Vox és més intensa entre els homes joves.
+L'excepció és el 13 de novembre, el dia que va començar oficialment la campanya. Aquell dia Vox va presentar el seu programa, Santiago Abascal va cancel·lar a última hora una entrevista amb el youtuber Jordi Wild i laSexta va emetre el primer debat. Entre els enquestats dels dies posteriors, Vox té uns `r ap("2026-11-13", "vi_vox")` punts menys d'intenció de vot que entre els dels dies anteriors, i la proporció que considera Abascal el millor president baixa uns `r ap("2026-11-13", "bestpm_abascal")` punts. Una part d'aquesta pèrdua torna al PP, que recupera alguns dels seus votants del 2023 que havien passat a Vox, i el PSOE també guanya terreny, tot i que cap de les dues pujades no és tan sòlida com la caiguda de Vox. La caiguda de Vox és més intensa entre els homes joves.
 
 No podem saber quin dels esdeveniments del 13 de novembre ho ha provocat, perquè tots van passar el mateix dia. Les enquestes diàries només detecten canvis grans, de quatre o cinc punts; els efectes més petits hi passen desapercebuts. Els detalls de les dades, el mètode i totes les comprovacions són a l'[annex tècnic](#annex).
 
@@ -44,7 +44,7 @@ La cobertura periodística tendeix a tractar cada dia de campanya com a decisiu:
 
 ### Una campanya estable
 
-40dB entrevista cada dia unes 500 persones noves per a *El País* i la SER [@40db2026tracking]. Avui, 17 de novembre, *El País* n'ha publicat l'estimació de vot amb el titular [«Vox se frena y cede terreno al PP»](https://elpais.com/espana/elecciones-generales/2026-11-17/vox-se-frena-y-cede-terreno-al-pp.html) [@elpais2026vox]. Aquí treballem amb les respostes individuals de les enquestes: si comparem les de dies successius, podem veure si l'opinió es mou després de cada esdeveniment. La @fig-series mostra la intenció de vot dels principals partits a cada mostra diària, des de l'enquesta preelectoral del 2 al 4 de novembre fins al 16 de novembre.
+40dB entrevista cada dia unes 500 persones noves per a *El País* i la SER [@40db2026tracking]. El 17 de novembre *El País* en va publicar l'estimació de vot amb el titular [«Vox se frena y cede terreno al PP»](https://elpais.com/espana/elecciones-generales/2026-11-17/vox-se-frena-y-cede-terreno-al-pp.html) [@elpais2026vox]. Aquí treballem amb les respostes individuals de les enquestes: si comparem les de dies successius, podem veure si l'opinió es mou després de cada esdeveniment. La @fig-series mostra la intenció de vot dels principals partits a cada mostra diària, des de l'enquesta preelectoral del 2 al 4 de novembre fins al `r fmt_date(last_end)`.
 
 ```{r fig-series}
 #| fig-cap: "Intenció de vot directa (percentatge sobre el total d'enquestats). Cada punt és una mostra diferent; la línia vertical de cada punt indica el marge d'error i la línia horitzontal, els dies en què es van fer les entrevistes. Les línies grises verticals marquen els dies amb esdeveniments rellevants."
@@ -53,13 +53,13 @@ La cobertura periodística tendeix a tractar cada dia de campanya com a decisiu:
 fig_series()
 ```
 
-Les línies es mouen, però la major part d'aquests moviments són soroll: amb 500 entrevistes, una estimació del 20 % té un marge d'error d'uns 3,5 punts amunt o avall. El PSOE, Frente Amplio i Podemos es mantenen dins d'aquest marge tota la setmana. Els dos moviments que destaquen són la caiguda de Vox a partir del 14 de novembre, que arriba al mínim (`r num(share("vi_vox", 4))` %) entre el 14 i el 15, i l'augment del PP, que passa d'un `r num(share("vi_pp", 1))` % entre el 10 i el 12 de novembre a un `r num(share("vi_pp", 5))` % entre el 15 i el 16.
+Les línies es mouen, però la major part d'aquests moviments són soroll: amb 500 entrevistes, una estimació del 20 % té un marge d'error d'uns 3,5 punts amunt o avall, i una del 30 %, d'uns 4 punts. Frente Amplio i Podemos es mantenen dins d'aquest marge tota la setmana. El moviment més clar és la caiguda de Vox a partir del 14 de novembre: arriba al mínim (`r num(share("vi_vox", 4))` %) entre el 14 i el 15 i des d'aleshores es manté per sota del seu nivell del 10 al 12 de novembre. El PP passa d'un `r num(share("vi_pp", 1))` % entre el 10 i el 12 de novembre a un `r num(share("vi_pp", 5))` % entre el 15 i el 16, però torna a baixar a un `r num(share("vi_pp", 6))` % entre el 16 i el 17. El PSOE puja i baixa d'un dia a l'altre i arriba a la xifra més alta, un `r num(share("vi_psoe", 6))` %, entre el 16 i el 17 de novembre.
 
 ### El 13 de novembre, Vox retrocedeix i el PP recupera votants
 
 El 13 de novembre va començar oficialment la campanya. Vox va presentar un programa centrat en la deportació de migrants i la "prioritat nacional" en l'accés a l'habitatge. Abascal va cancel·lar l'entrevista que tenia programada amb Jordi Wild, unes hores abans de gravar-la, mentre que Sánchez, Feijóo i Colau sí que hi van participar; la decisió va ser criticada fins i tot per veus properes a Vox. A la nit, laSexta va emetre el debat econòmic entre els portaveus dels quatre grans partits.
 
-La @fig-dumbbell compara les 1.000 persones entrevistades entre el 10 i el 12 de novembre amb les 1.000 entrevistades entre el 14 i el 16. La intenció de vot a Vox passa d'un `r lvl("vi_vox", 1)` % a un `r lvl("vi_vox", 4:5)` %, i la proporció que veu Abascal com el millor president, d'un `r lvl("bestpm_abascal", 1)` % a un `r lvl("bestpm_abascal", 4:5)` %. El PP puja d'un `r lvl("vi_pp", 1)` % a un `r lvl("vi_pp", 4:5)` %, i Feijóo com a millor president, d'un `r lvl("bestpm_feijoo", 1)` % a un `r lvl("bestpm_feijoo", 4:5)` %. La caiguda de Vox i d'Abascal és prou gran per descartar que sigui fruit de l'atzar, i es manté amb totes les maneres alternatives de fer el càlcul que hem provat. La pujada del PP és menys segura. El PSOE i Sánchez també pugen lleugerament, però dins del marge d'error.
+La @fig-dumbbell compara les 1.000 persones entrevistades entre el 10 i el 12 de novembre amb les `r num(n_post13, 0)` entrevistades entre el 14 i el `r day_last`. La intenció de vot a Vox passa d'un `r lvl("vi_vox", 1)` % a un `r lvl("vi_vox", post13)` %, i la proporció que veu Abascal com el millor president, d'un `r lvl("bestpm_abascal", 1)` % a un `r lvl("bestpm_abascal", post13)` %. El PP puja d'un `r lvl("vi_pp", 1)` % a un `r lvl("vi_pp", post13)` %, i Feijóo com a millor president, d'un `r lvl("bestpm_feijoo", 1)` % a un `r lvl("bestpm_feijoo", post13)` %. La caiguda de Vox i d'Abascal és prou gran per descartar que sigui fruit de l'atzar, i es manté amb totes les maneres alternatives de fer el càlcul que hem provat. La pujada del PP és menys segura: només és significativa en `r n_sig_specs("2026-11-13", "vi_pp")` de les `r n_specs` especificacions. El PSOE passa d'un `r lvl("vi_psoe", 1)` % a un `r lvl("vi_psoe", post13)` %, una pujada significativa a l'especificació principal però no després de corregir per comparacions múltiples; la de Sánchez com a millor president és dins del marge d'error.
 
 ```{r fig-dumbbell}
 #| fig-cap: "Intenció de vot i preferència per al millor president abans i després del 13 de novembre (percentatges ponderats)."
@@ -70,21 +70,25 @@ fig_dumbbell()
 
 Qui es mou? Entre els qui diuen haver votat el PP el 2023, la proporció que torna a votar el PP passa del `r num(100 * flows$pre[flows$recall == "PP" & flows$intention == "PP"], 0)` % al `r num(100 * flows$post[flows$recall == "PP" & flows$intention == "PP"], 0)` %, i la que declara vot a Vox baixa uns `r num(abs(flow("PP", "Vox")), 0)` punts. Els votants de Vox del 2023 continuen igual de fidels. El que veiem, per tant, és el retorn al PP de votants del PP que s'havien passat a Vox, i no una pèrdua del nucli de Vox.
 
-La caiguda és molt més intensa entre els homes de 18 a 34 anys: la intenció de vot a Vox en aquest grup passa d'un `r lvl("vi_vox", 1, young_men)` % a un `r lvl("vi_vox", 4:5, young_men)` %. És el que s'esperaria si la cancel·lació de l'entrevista amb Jordi Wild, que té una audiència sobretot jove i masculina, hagués perjudicat Abascal. Aquesta xifra, però, es basa en només un centenar d'entrevistes a cada període i s'ha de llegir amb prudència.
+La caiguda és molt més intensa entre els homes de 18 a 34 anys: la intenció de vot a Vox en aquest grup passa d'un `r lvl("vi_vox", 1, young_men)` % a un `r lvl("vi_vox", post13, young_men)` %. És el que s'esperaria si la cancel·lació de l'entrevista amb Jordi Wild, que té una audiència sobretot jove i masculina, hagués perjudicat Abascal. Aquesta xifra, però, es basa en només un centenar d'entrevistes a cada període i s'ha de llegir amb prudència.
 
 No podem atribuir el canvi a un sol esdeveniment. L'inici de campanya, el programa de Vox, la renúncia a l'entrevista i el debat de laSexta van coincidir el mateix dia, i les dades no permeten separar-los. A més, la mostra del 10 al 12 de novembre ja tenia un nivell de Vox una mica més alt que l'enquesta de principis de novembre; una part de la caiguda podria ser simplement un retorn a la normalitat. Fins i tot tenint-ho en compte, la caiguda de Vox es manté, tot i que és més petita (uns `r ap("2026-11-13", "vi_vox", "with_preelectoral")` punts).
 
 ### La vaga general i les càrregues policials no mouen el vot
 
-La vaga general per l'habitatge de l'11 de novembre, les càrregues policials contra els manifestants i el suport de Sánchez al ministre de l'Interior, Fernando Grande-Marlaska, l'endemà podien haver allunyat votants d'esquerra del PSOE cap a Frente Amplio o Podemos. No ho observem: entre els votants del PSOE i de Sumar del 2023, la intenció de vot a cada partit gairebé no canvia (menys d'un punt). En aquest cas l'única comparació possible és amb l'enquesta del 2 al 4 de novembre, feta una setmana abans i amb altres esdeveniments entremig, de manera que la conclusió és més feble. Un efecte petit, d'un o dos punts, no el podríem detectar.
+La vaga general per l'habitatge de l'11 de novembre, les càrregues policials contra els manifestants i el suport de Sánchez al ministre de l'Interior, Fernando Grande-Marlaska, l'endemà podien haver allunyat votants d'esquerra del PSOE cap a Frente Amplio o Podemos. No ho observem: entre els votants del PSOE i de Sumar del 2023, la intenció de vot a Frente Amplio i a Podemos gairebé no canvia (menys d'un punt) i el PSOE no perd terreny. En aquest cas l'única comparació possible és amb l'enquesta del 2 al 4 de novembre, feta una setmana abans i amb altres esdeveniments entremig, de manera que la conclusió és més feble. Un efecte petit, d'un o dos punts, no el podríem detectar.
 
 ### Hernani i Canàries: encara és aviat per dir-ho
 
-El 14 de novembre un grup de persones va atacar una carpa informativa del PP a Hernani, i aquell cap de setmana es va registrar un rècord d'arribades de pasteres a Canàries. Entre el 15 i el 16 de novembre el PP té uns `r ap("2026-11-14", "vi_pp")` punts més que abans, però és impossible separar aquest augment del que ja havia començat el dia 13. Tampoc no podem comprovar si l'efecte és més gran al País Basc o a Canàries, perquè en una sola mostra diària hi ha menys de 30 entrevistes de cadascuna d'aquestes comunitats.
+El 14 de novembre un grup de persones va atacar una carpa informativa del PP a Hernani, i aquell cap de setmana es va registrar un rècord d'arribades de pasteres a Canàries. Entre el 15 i el `r fmt_date(last_end)` el PP té uns `r ap("2026-11-14", "vi_pp")` punts més que abans, una diferència que no és significativa i que és impossible separar de l'augment que ja havia començat el dia 13. Tampoc no podem comprovar si l'efecte és més gran al País Basc o a Canàries, perquè en una sola mostra diària hi ha com a màxim `r max_region_n` entrevistes de cadascuna d'aquestes comunitats.
+
+### 15 de novembre: el programa del PSOE
+
+El 15 de novembre el PSOE va presentar el seu programa i Sánchez va titllar Abascal de «racista». Les `r num(post_n("2026-11-15"), 0)` persones entrevistades `r post_range("2026-11-15")` votarien el PSOE uns `r ap("2026-11-15", "vi_psoe")` punts més, i Vox uns `r ap("2026-11-15", "vi_vox")` punts menys, que les entrevistades fins al 14. Els dos canvis van en la direcció esperada, però es basen en `r samples_txt("2026-11-15")` i deixen de ser significatius quan es corregeix per comparacions múltiples. A més, el grup de comparació inclou els dies anteriors al 13 de novembre, de manera que aquestes diferències arrosseguen el canvi que va començar aquell dia.
 
 ### Com cal llegir aquests resultats
 
-Aquestes estimacions comparen persones diferents entrevistades en dies diferents. Funcionen com un experiment natural perquè cada dia 40dB entrevista una mostra nova amb les mateixes quotes de sexe, edat, territori i classe social. Hem comprovat que els entrevistats abans i després de cada esdeveniment s'assemblen en característiques que l'esdeveniment no pot haver canviat, com els estudis o la situació laboral, i també en el vot que declaren haver fet el 2023. Tot i així, cal tenir presents tres limitacions. Amb 500 entrevistes diàries només es detecten canvis d'uns quatre o cinc punts. Els esdeveniments del mateix dia no es poden separar. I a les dades de 40dB hi ha un 3 % d'entrevistes duplicades, que hem tingut en compte sense que canviïn els resultats.
+Aquestes estimacions comparen persones diferents entrevistades en dies diferents. Funcionen com un experiment natural perquè cada dia 40dB entrevista una mostra nova amb les mateixes quotes de sexe, edat, territori i classe social. Hem comprovat que els entrevistats abans i després de cada esdeveniment s'assemblen en característiques que l'esdeveniment no pot haver canviat, com els estudis o la situació laboral, i també en el vot que declaren haver fet el 2023. Tot i així, cal tenir presents tres limitacions. Amb 500 entrevistes diàries només es detecten canvis d'uns quatre o cinc punts. Els esdeveniments del mateix dia no es poden separar. I a les dades de 40dB hi ha un `r num(pct_dup_all, 0)` % d'entrevistes duplicades, que hem tingut en compte sense que canviïn els resultats.
 
 Els propers dies del tracking permetran avaluar el cara a cara entre Sánchez i Feijóo del 19 de novembre i veure si la caiguda de Vox es consolida o es reverteix.
 
@@ -94,20 +98,20 @@ Aquesta secció recull les dades, el disseny, les proves diagnòstiques i les es
 
 ### Dades
 
-40dB publica el tracking com a fitxers acumulatius [@40db2026tracking]. El fitxer del dia 2 conté les 1.000 entrevistes fetes del 10 al 12 de novembre i 500 més del 12 al 13. Els dies 3 i 4 hi afegeixen 500 entrevistes cadascun, i a partir del dia 5 la finestra és mòbil: entra el bloc més recent i surt el més antic. Com que l'identificador es renumera i la ponderació es recalcula en cada fitxer, hem reconstruït la mostra d'entrevistes úniques comparant el perfil complet de respostes de cada registre i la seva posició. Cada fitxer resulta ser exactament l'anterior, sense els blocs més antics, amb les entrevistes noves afegides al final. El resultat són 3.000 entrevistes úniques en cinc blocs de treball de camp (@fig-timeline). Hi afegim la primera enquesta preelectoral de 40dB (2-4 de novembre, 2.000 entrevistes), que comparteix les preguntes de vot amb el tracking i ens serveix com a referència anterior a la campanya [@40db2026pre]. Totes les dades es poden descarregar del web d'*El País*: [preelectoral](https://ep00.epimg.net/infografias/encuestas40db/2026/11-preelectoral/2026_11_preelectoral_descargables.zip), [dia 2](https://ep00.epimg.net/infografias/encuestas40db/2026/11-tracking-electoral/40dB_tracking_dia02.zip), [dia 3](https://ep00.epimg.net/infografias/encuestas40db/2026/11-tracking-electoral/40dB_tracking_dia03.zip), [dia 4](https://ep00.epimg.net/infografias/encuestas40db/2026/11-tracking-electoral/40dB_tracking_dia04.zip), [dia 5](https://ep00.epimg.net/infografias/encuestas40db/2026/11-tracking-electoral/40dB_tracking_dia05.zip).
+40dB publica el tracking com a fitxers acumulatius [@40db2026tracking]. El fitxer del dia 2 conté les 1.000 entrevistes fetes del 10 al 12 de novembre i 500 més del 12 al 13. Els dies 3 i 4 hi afegeixen 500 entrevistes cadascun, i a partir del dia 5 la finestra és mòbil: entra el bloc més recent i surt el més antic. Com que l'identificador es renumera i la ponderació es recalcula en cada fitxer, hem reconstruït la mostra d'entrevistes úniques comparant el perfil complet de respostes de cada registre i la seva posició. Cada fitxer resulta ser exactament l'anterior, sense els blocs més antics, amb les entrevistes noves afegides al final. El resultat són `r num(n_trk, 0)` entrevistes úniques en `r n_trk_blocks` blocs de treball de camp (@fig-timeline). Hi afegim la primera enquesta preelectoral de 40dB (2-4 de novembre, 2.000 entrevistes), que comparteix les preguntes de vot amb el tracking i ens serveix com a referència anterior a la campanya [@40db2026pre]. Totes les dades es poden descarregar del web d'*El País*: `r data_links()`.
 
 Les dades no inclouen la data ni l'hora de cada entrevista. Cada bloc diari ocupa dos dies naturals (per exemple, del 13 al 14 de novembre), de manera que un esdeveniment del 13 de novembre pot ser anterior o posterior a les entrevistes dels blocs 2 i 3.
 
 ```{r fig-timeline}
 #| fig-cap: "Blocs de treball de camp i esdeveniments. Cada barra és un bloc de mostra independent; els punts marquen els esdeveniments segons si eren inesperats, programats o mixtos (vegeu la @tbl-events)."
 #| fig-width: 9
-#| fig-height: 4
+#| fig-height: !expr 2.6 + 0.2 * nrow(blocks)
 fig_timeline()
 ```
 
-40dB fa servir quotes de sexe per edat, comunitat autònoma, mida del municipi i classe social. Hem ponderat cada bloc per separat amb un *raking* cap als mateixos marginals poblacionals, presos del fitxer ponderat del dia 4, perquè les comparacions entre dies no depenguin de quin fitxer prové cada entrevista. Els pesos són poc dispersos (efecte de disseny d'entre 1,02 i 1,06).
+40dB fa servir quotes de sexe per edat, comunitat autònoma, mida del municipi i classe social. Hem ponderat cada bloc per separat amb un *raking* cap als mateixos marginals poblacionals, presos del fitxer ponderat del dia 4, perquè les comparacions entre dies no depenguin de quin fitxer prové cada entrevista. Els pesos són poc dispersos (efecte de disseny d'entre `r num(deff_range[1], 2)` i `r num(deff_range[2], 2)`).
 
-Hem trobat `r n_dup_trk` entrevistes del tracking que són còpies exactes d'una altra en les 31 variables (edat exacta, província, deu probabilitats de vot...), gairebé sempre en un dia de treball de camp diferent. La proporció creix amb el temps i arriba al `r num(pct_dup_b5)` % del bloc 5. Probablement són registres duplicats o panelistes reentrevistats. Les mantenim a l'anàlisi principal i les excloem en una prova de robustesa.
+Hem trobat `r n_dup_trk` entrevistes del tracking que són còpies exactes d'una altra en les 31 variables (edat exacta, província, deu probabilitats de vot...), gairebé sempre en un dia de treball de camp diferent. La proporció creix amb el temps, des d'un `r num(pct_dup_blk(1))` % del bloc 1 fins a entre un `r num(pct_dup_late[1], 0)` % i un `r num(pct_dup_late[2], 0)` % de cada bloc a partir del 3. Probablement són registres duplicats o panelistes reentrevistats. Les mantenim a l'anàlisi principal i les excloem en una prova de robustesa.
 
 ### Disseny
 
@@ -126,7 +130,7 @@ El model principal és una regressió lineal ponderada de cada indicador sobre u
 kable(tab_events())
 ```
 
-El 10 i l'11 de novembre comparteixen grups de comparació i tenen estimacions idèntiques. Els esdeveniments del 15 i el 16 de novembre encara no tenen cap bloc posterior.
+El 10 i l'11 de novembre comparteixen grups de comparació i tenen estimacions idèntiques. Els esdeveniments del `r fmt_days(days_without_post())` encara no tenen cap bloc posterior.
 
 ### Diagnòstics
 
@@ -135,10 +139,10 @@ El 10 i l'11 de novembre comparteixen grups de comparació i tenen estimacions i
 kable(tab_diagnostics())
 ```
 
-**Balanç.** Per a cada dia d'esdeveniments, cap prova conjunta de les covariables no de quota (estudis, situació laboral, fills a la llar) i del record de vot no és significativa (@tbl-diag). Per al 13 de novembre totes les diferències estandarditzades són inferiors a 0,1 (@fig-balance). Les variables de quota estan balancejades per construcció un cop ponderat cada bloc. La composició per record de vot no varia entre els cinc blocs del tracking (*F* = `r num(comp_F, 2)`, `r pval(comp_p)`), i només `r n_placebo_sig` de les `r n_placebo` proves placebo sobre el record de vot són significatives al 5 %, totes dues en comparacions amb l'enquesta preelectoral.
+**Balanç.** Per a cada dia d'esdeveniments, cap prova conjunta de les covariables no de quota (estudis, situació laboral, fills a la llar) i del record de vot no és significativa (@tbl-diag). Per al 13 de novembre totes les diferències estandarditzades són inferiors a 0,1 (@fig-balance). Les variables de quota estan balancejades per construcció un cop ponderat cada bloc. La composició per record de vot no varia entre els `r n_trk_blocks` blocs del tracking (*F* = `r num(comp_F, 2)`, `r pval(comp_p)`), i cap de les `r n_placebo` proves placebo sobre el record de vot no és significativa al 5 %.
 
 ```{r fig-balance}
-#| fig-cap: "Balanç de covariables entre els grups pre (bloc 1) i post (blocs 4 i 5) del 13 de novembre. La franja grisa marca diferències estandarditzades inferiors a 0,1."
+#| fig-cap: !expr 'paste0("Balanç de covariables entre els grups pre (bloc 1) i post (blocs 4 a ", last_block, ") del 13 de novembre. La franja grisa marca diferències estandarditzades inferiors a 0,1.")'
 #| fig-width: 8
 #| fig-height: 6.5
 fig_balance()
@@ -148,23 +152,23 @@ fig_balance()
 
 **Estabilitat del període previ.** La prova placebo de dividir el grup de control per la mediana de dies no és possible, perquè el bloc 1 no té dates individuals. Com a alternativa, comparem el bloc 1 amb l'enquesta preelectoral: la diferència de Vox és de `r prestab_pts("vi_vox")`, no significativa però en la direcció que podria inflar la caiguda posterior.
 
-**Potència.** L'efecte mínim detectable amb una potència del 80 % per a la intenció de vot a Vox és de `r num(mde("2026-11-13"))` punts el 13 de novembre i de `r num(mde("2026-11-14"))` el 14. Cap prova global de diferències entre els cinc blocs del tracking sobreviu a la correcció per comparacions múltiples (*q* mínim = `r num(omni_min_q, 2)`; sense corregir, Vox `r pval(omni_p("vi_vox"))` i Abascal com a millor president `r pval(omni_p("bestpm_abascal"))`).
+**Potència.** L'efecte mínim detectable amb una potència del 80 % per a la intenció de vot a Vox és de `r num(mde("2026-11-13"))` punts el 13 de novembre i de `r num(mde("2026-11-14"))` el 14. Cap prova global de diferències entre els `r n_trk_blocks` blocs del tracking sobreviu a la correcció per comparacions múltiples (*q* mínim = `r num(omni_min_q, 2)`; sense corregir, Vox `r pval(omni_p("vi_vox"))` i Abascal com a millor president `r pval(omni_p("bestpm_abascal"))`).
 
 ### Resultats detallats
 
 ```{r fig-events}
-#| fig-cap: "Diferències post − pre per dia d'esdeveniments (especificació principal). Per a l'11 i el 12 de novembre el grup pre és l'enquesta preelectoral; per al 13 i el 14, els blocs del tracking anteriors a l'esdeveniment. Magenta: indicadors amb hipòtesi prèvia; blau: placebos."
+#| fig-cap: "Diferències post − pre per dia d'esdeveniments (especificació principal). Per a l'11 i el 12 de novembre el grup pre és l'enquesta preelectoral; a partir del 13, els blocs del tracking anteriors a l'esdeveniment. Magenta: indicadors amb hipòtesi prèvia; blau: placebos."
 #| fig-width: 11
-#| fig-height: 6.5
+#| fig-height: !expr 1.5 + 5 * ceiling(length(fig_event_days) / 5)
 fig_events()
 ```
 
 ```{r tbl-13nov}
-#| tbl-cap: "13 de novembre: diferències entre els enquestats del 14-16 i del 10-12 de novembre. Pre: percentatge al bloc 1. Regressió lineal ponderada amb controls de quota i estudis; errors HC2; q: valors de Benjamini-Hochberg."
+#| tbl-cap: !expr 'paste0("13 de novembre: diferències entre els enquestats del 14-", day_last, " i del 10-12 de novembre. Pre: percentatge al bloc 1. Regressió lineal ponderada amb controls de quota i estudis; errors HC2; q: valors de Benjamini-Hochberg.")'
 kable(tab_13nov())
 ```
 
-La caiguda d'Abascal com a millor president (`r pts_q("2026-11-13", "bestpm_abascal")`) és l'única estimació amb un valor *q* proper a 0,05. La de Vox és de `r pts_q("2026-11-13", "vi_vox")` i la del PP, de `r pts_q("2026-11-13", "vi_pp")`. La caiguda de Vox i d'Abascal és significativa en les vuit especificacions de la @fig-robust. Quan els blocs que contenen el dia 13 es tracten com a posteriors, l'efecte sobre Vox s'atenua fins a `r pts("2026-11-13", "vi_vox", "during_as_post")`, i amb l'enquesta preelectoral afegida al grup *pre* és de `r pts("2026-11-13", "vi_vox", "with_preelectoral")`. El guany del PP és significatiu en quatre de les vuit especificacions.
+Les caigudes d'Abascal com a millor president (`r pts_q("2026-11-13", "bestpm_abascal")`) i de Vox (`r pts_q("2026-11-13", "vi_vox")`) són les úniques estimacions amb un valor *q* proper a 0,05. La del PSOE és de `r pts_q("2026-11-13", "vi_psoe")` i la del PP, de `r pts_q("2026-11-13", "vi_pp")`. La caiguda de Vox i d'Abascal és significativa en les `r n_specs` especificacions de la @fig-robust. Quan els blocs que contenen el dia 13 es tracten com a posteriors, l'efecte sobre Vox s'atenua fins a `r pts("2026-11-13", "vi_vox", "during_as_post")`, i amb l'enquesta preelectoral afegida al grup *pre* és de `r pts("2026-11-13", "vi_vox", "with_preelectoral")`. El guany del PP és significatiu en `r n_sig_specs("2026-11-13", "vi_pp")` de les `r n_specs` especificacions, i el del PSOE, en `r n_sig_specs("2026-11-13", "vi_psoe")`.
 
 ```{r fig-robust}
 #| fig-cap: "Robustesa de les estimacions del 13 de novembre. Per a cada especificació s'indica la mida dels grups pre/post i, per a les variacions de finestra, la potència per detectar un efecte de 5 punts."
@@ -173,7 +177,7 @@ La caiguda d'Abascal com a millor president (`r pts_q("2026-11-13", "bestpm_abas
 fig_robust()
 ```
 
-**Heterogeneïtat.** La @fig-het mostra els efectes en grups definits abans d'estimar. Entre els homes de 18 a 34 anys, la diferència en la intenció de vot a Vox el 13 de novembre és de `r het_pts("H2", "vi_vox")` (`r het_n("H2", "vi_vox")$n_group_pre` enquestats pre i `r het_n("H2", "vi_vox")$n_group_post` post), concentrada sobretot al bloc 4. Entre els votants del PSOE i Sumar del 2023, la diferència en la intenció de vot a Frente Amplio després de la vaga és de `r het_pts("H1", "vi_fa")` i en la del PSOE, de `r het_pts("H1", "vi_psoe")`. Per al 14 de novembre, la diferència per al PP és de `r pts("2026-11-14", "vi_pp")`, però el grup *pre* inclou blocs anteriors al 13 de novembre i hereta la tendència d'aquell dia, una violació del supòsit d'exclusió per tendència temporal [@munoz2020]. Les falsacions regionals (H4 i H5) tenen menys de 30 casos al grup post. Les heterogeneïtats per record de vot (H1, H3) i els fluxos de vot s'han de llegir amb cautela, perquè el moderador podria estar afectat pel tractament.
+**Heterogeneïtat.** La @fig-het mostra els efectes en grups definits abans d'estimar. Entre els homes de 18 a 34 anys, la diferència en la intenció de vot a Vox el 13 de novembre és de `r het_pts("H2", "vi_vox")` (`r het_n("H2", "vi_vox")$n_group_pre` enquestats pre i `r het_n("H2", "vi_vox")$n_group_post` post), concentrada sobretot al bloc 4. Entre els votants del PSOE i Sumar del 2023, la diferència en la intenció de vot a Frente Amplio després de la vaga és de `r het_pts("H1", "vi_fa")` i en la del PSOE, de `r het_pts("H1", "vi_psoe")`. Per al 14 de novembre, la diferència per al PP és de `r pts("2026-11-14", "vi_pp")`, però el grup *pre* inclou blocs anteriors al 13 de novembre i hereta la tendència d'aquell dia, una violació del supòsit d'exclusió per tendència temporal [@munoz2020]. Les falsacions regionals (H4 i H5) només tenen `r het_n("H4")$n_group_post` i `r het_n("H5")$n_group_post` casos al grup post. Les heterogeneïtats per record de vot (H1, H3) i els fluxos de vot s'han de llegir amb cautela, perquè el moderador podria estar afectat pel tractament.
 
 ```{r fig-het}
 #| fig-cap: "Efectes per grups definits a priori. Grup: diferència post − pre dins del grup; Resta: fora del grup; Diferència: interacció."

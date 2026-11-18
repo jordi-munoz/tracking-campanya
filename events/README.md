@@ -1,6 +1,8 @@
 # Political events, 29-N 2026 general election campaign
 
-`events_29N.csv` is the machine-readable event list used by the R scripts (one row per event; `outcomes` lists the hypothesised outcome variables, separated by `;`). Compiled on 17 Nov 2026 from live blogs and news reports; check the sources before citing. `date_precision = approximate` marks dates not confirmed by a primary news source.
+`events_29N.csv` is the machine-readable event list used by the R scripts (one row per event; `outcomes` lists the hypothesised outcome variables, separated by `;`). Compiled on 17 Nov 2026 and updated on 18 Nov from live blogs and news reports; check the sources before citing. `date_precision = approximate` marks dates not confirmed by a primary news source.
+
+To add an event: give it the next free ID (E28, E29, …; IDs are never renumbered because the reports refer to them), keep rows in date order, and add its label in Catalan, Spanish and English to `event_lab()` in `reports/_common.R`. Whether an event is before, between or during fieldwork, or after the last available block, is not stored in the file: `event_phase()` in `R/fieldwork.R` derives it from `config/fieldwork_blocks.csv`, so later events enter the analysis automatically once a new tracking day covers them.
 
 ## Timeline against fieldwork
 
@@ -16,9 +18,11 @@
 | 13 Nov | Blocks 2–3 | **E11** Official campaign start; Vox programme. **E12** Jordi Wild interviews, Abascal cancels. **E13** laSexta economic debate (evening) |
 | 14 Nov | Blocks 3–4 | **E14** Attack on PP tent in Hernani (morning). **E15** Record boat arrivals in Canarias (weekend; weak source) |
 | 15 Nov | Blocks 4–5 | **E16** PSOE programme; Sánchez calls Abascal "racist" |
-| 16 Nov | Block 5 (end) | **E17** Lula at Moncloa; Frente Amplio programme; CNI finds no evidence of Moroccan involvement in Ceuta. **E18** Tense Telecinco interview on Ceuta (evening; some outlets date it 17 Nov) |
-| 17 Nov | — | **E19** Public-sector pay rise approved |
+| 16 Nov | Blocks 5–6 | **E17** Lula at Moncloa; Frente Amplio programme; CNI finds no evidence of Moroccan involvement in Ceuta. **E18** Tense Telecinco interview on Ceuta (evening; some outlets date it 17 Nov) |
+| 17 Nov | Block 6 (end) | **E19** Public-sector pay rise and minimum wage (SMI) increase approved. **E24** Abascal's wife receives the heating subsidy for vulnerable families; Abascal defends it with a crude attack on Sánchez's allies |
+| 18 Nov | — | **E25** Feijóo on the podcast *El sentido de la birra* (no red lines from Vox; euthanasia law). **E26** Sánchez interviewed on Antena 3 |
 | 19 Nov | — | **E20** Sánchez–Feijóo head-to-head debate |
+| 23 Nov | — | **E27** Train drivers' strike (Semaf) |
 | 24–28 Nov | — | **E21** Poll publication ban |
 | 26 Nov | — | **E22** Four-way debate |
 | 29 Nov | — | **E23** Election day |
@@ -33,4 +37,5 @@ Background running through the period: the Ceuta migration crisis (mass entry of
 - Urda crash: [Moncloa.com](https://www.moncloa.com/2026/11/03/victimas-accidente-urda-identificadas-3460636); Puente: [Wikipedia](https://en.wikipedia.org/wiki/%C3%93scar_Puente)
 - laSexta debate: [Demócrata](https://www.democrata.es/elecciones-generales-espana/quien-gano-debate-lasexta-propuestas-respuestas-cuatro-candidatos/)
 - Ceuta crisis and the Telecinco interview: [El Faro de Ceuta](https://elfarodeceuta.es/actualidad/politica/franganillo-pedro-sanchez-vacaciones-crisis-ceuta/), [Wikipedia: Crisis migratoria de Ceuta de 2026](https://es.wikipedia.org/wiki/Crisis_migratoria_de_Ceuta_de_2026)
+- 17–18 Nov: [Infobae 18 Nov](https://www.infobae.com/espana/2026/11/18/elecciones-generales-29-n-en-directo-ultima-hora-de-la-campana-los-candidatos-y-los-sondeos/); Abascal and the heating subsidy: [El Español](https://www.elespanol.com/espana/politica/20261117/abascal-justifica-mujer-cobre-bono-social-termico-familia-numerosa-especial-justicia/1003744461592_0.html), [Infobae](https://www.infobae.com/espana/2026/11/17/abascal-defiende-que-su-mujer-cobre-el-bono-social-termico-el-dinero-de-los-espanoles-mejor-para-las-familias-que-para-los-amigos-de-sanchez-que-se-lo-gastan-en-putas-y-mordidas/); Feijóo's podcast: [Libertad Digital](https://www.libertaddigital.com/espana/politica/2026-11-18/feijoo-marca-limites-a-vox-no-sera-presidente-a-cualquier-precio-ni-aceptara-retrocesos-en-derechos-7493812/)
 - Canarias arrivals: [notasdeprensa.org](https://notasdeprensa.org/abascal-califica-la-llegada-de-los-cayucos-a-canarias-como-una-invasion-planificada) (press-release aggregator; verify with Interior Ministry data)
