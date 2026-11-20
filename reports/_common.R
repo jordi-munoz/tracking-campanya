@@ -91,7 +91,11 @@ event_lab <- function(id) {
           E22 = "Debat a quatre", E23 = "Jornada electoral",
           E24 = "La dona d'Abascal cobra el bo social tèrmic",
           E25 = "Entrevista a Feijóo al pòdcast El sentido de la birra",
-          E26 = "Entrevista a Sánchez a Antena 3", E27 = "Vaga de maquinistes (Semaf)")
+          E26 = "Entrevista a Sánchez a Antena 3", E27 = "Els maquinistes desconvoquen la vaga (Semaf)",
+          E28 = "La Diputació Permanent convalida set decrets llei",
+          E29 = "Entrevista a Puigdemont a El Mundo",
+          E30 = "Informe policial: l'entrada massiva a Ceuta va ser planificada",
+          E31 = "El Suprem impedeix votar als nacionalitzats per la llei de néts")
   es <- c(E01 = "Convocatoria anticipada", E02 = "Accidente ferroviario de Urda",
           E03 = "Dimisión del ministro Puente", E04 = "Zapatero sigue investigado (Plus Ultra)",
           E05 = "Programa del PP", E06 = "Huelga general por la vivienda y cargas policiales",
@@ -109,7 +113,11 @@ event_lab <- function(id) {
           E22 = "Debate a cuatro", E23 = "Jornada electoral",
           E24 = "La mujer de Abascal cobra el bono social térmico",
           E25 = "Entrevista a Feijóo en el pódcast El sentido de la birra",
-          E26 = "Entrevista a Sánchez en Antena 3", E27 = "Huelga de maquinistas (Semaf)")
+          E26 = "Entrevista a Sánchez en Antena 3", E27 = "Los maquinistas desconvocan la huelga (Semaf)",
+          E28 = "La Diputación Permanente convalida siete decretos ley",
+          E29 = "Entrevista a Puigdemont en El Mundo",
+          E30 = "Informe policial: la entrada masiva en Ceuta fue planificada",
+          E31 = "El Supremo impide votar a los nacionalizados por la ley de nietos")
   en <- c(E01 = "Snap election called", E02 = "Urda rail crash",
           E03 = "Transport minister Puente resigns", E04 = "Zapatero remains under investigation (Plus Ultra)",
           E05 = "PP programme", E06 = "General strike on housing and police charges",
@@ -127,7 +135,11 @@ event_lab <- function(id) {
           E22 = "Four-way debate", E23 = "Election day",
           E24 = "Abascal's wife receives a heating subsidy",
           E25 = "Feijóo interview on the podcast El sentido de la birra",
-          E26 = "Sánchez interview on Antena 3", E27 = "Train drivers' strike (Semaf)")
+          E26 = "Sánchez interview on Antena 3", E27 = "Train drivers call off their strike (Semaf)",
+          E28 = "Diputación Permanente validates seven decree-laws",
+          E29 = "Puigdemont interview in El Mundo",
+          E30 = "Police report: the Ceuta mass entry was planned",
+          E31 = "Supreme Court bars 'ley de nietos' citizens from voting")
   if (any(is.na(L(ca, es, en)[id])))
     stop("Add translations to event_lab() in reports/_common.R for: ",
          paste(setdiff(id, names(en)), collapse = ", "))
@@ -183,6 +195,7 @@ pts <- function(date, outcome, spec = NULL) {
   k <- if (str_starts(outcome, "ptv_")) 1 else 100
   paste0(signed(k * r$estimate), L(" punts", " puntos", " points"), " (", pval(r$p.value), ")")
 }
+pv <- function(date, outcome, spec = NULL) pval(get_est(date, outcome, spec)$p.value)
 pts_q <- function(date, outcome) {
   r <- get_est(date, outcome)
   paste0(signed(100 * r$estimate), L(" punts", " puntos", " points"), " (", pval(r$p.value), "; ", qval(r$q.value), ")")
@@ -248,7 +261,8 @@ fig_series <- function() {
     geom_point(size = 2.2) +
     geom_line(data = filter(vi, survey == "tracking"), linewidth = 0.7) +
     facet_wrap(~party, scales = "free_y", ncol = 3) +
-    scale_y_continuous(labels = \(x) num(x, 0)) +
+    # one decimal when a panel's breaks are not whole numbers (e.g. Podemos, 0.5 steps)
+    scale_y_continuous(labels = \(x) num(x, if (all(x == round(x), na.rm = TRUE)) 0 else 1)) +
     scale_colour_manual(values = party_cols, guide = "none") +
     date_axis(seq(as.Date("2026-11-03"), last_end, by = 3)) +
     labs(x = NULL, y = L("% sobre el total d'enquestats (ponderat)", "% sobre el total de encuestados (ponderado)", "% of all respondents (weighted)"))
@@ -445,6 +459,8 @@ mde <- function(date, outcome = "vi_vox") 100 * get_est(date, outcome)$mde80
 n_sig_specs <- function(date, outcome)
   sum(allspecs$p.value[allspecs$date == as.Date(date) & allspecs$outcome == outcome] < 0.05)
 n_specs <- n_distinct(allspecs$spec)
+# Tests in the main (tracking-only) specification's multiple-comparison family.
+n_q_tests <- sum(allspecs$spec == "tracking" & allspecs$type == "outcome")
 n_post13 <- sum(blocks$n[blocks$block %in% post13])
 
 # Plain-language helpers for the results section -----------------------------
@@ -546,7 +562,7 @@ max_region_n <- max(
 # render anyway (e.g. to look at a draft); reports/check_claims.R prints the
 # status without rendering. When you revise the text, update the matching row.
 report_claims <- function() {
-  d13 <- "2026-11-13"; d14 <- "2026-11-14"; d15 <- "2026-11-15"
+  d13 <- "2026-11-13"; d14 <- "2026-11-14"; d15 <- "2026-11-15"; d16 <- "2026-11-16"; d17 <- "2026-11-17"
   e <- function(d, o, s = NULL) get_est(d, o, s)$estimate
   p <- function(d, o, s = NULL) get_est(d, o, s)$p.value
   q <- function(d, o) get_est(d, o)$q.value
@@ -559,7 +575,12 @@ report_claims <- function() {
   core <- c("vi_psoe", "vi_pp", "vi_vox", "vi_fa", "vi_podemos", "undecided", "likely",
             "bestpm_sanchez", "bestpm_feijoo", "bestpm_abascal", "bestpm_colau")
   q13 <- primary |> filter(date == as.Date(d13), outcome %in% core)
+  out_p <- primary |> filter(type == "outcome") |> arrange(p.value)
   het_in <- function(h, o) het$estimate[str_starts(het$hyp, h) & het$outcome == o & het$contrast == "inside"]
+  het_p  <- function(h, o) het$p.value[str_starts(het$hyp, h) & het$outcome == o & het$contrast == "inside"]
+  near_sig <- function(d, o) p(d, o) >= 0.05 && p(d, o) < 0.1 && n_sig_specs(d, o) < n_specs / 2
+  none_sig <- function(d) all(primary$p.value[primary$date == as.Date(d) & primary$outcome %in% core] >= 0.05)
+  plc_q <- primary$q.value[primary$type == "placebo"]
   vox_ym <- sapply(post13, \(b) lv("vi_vox", b, young_men))
   nr_post <- function(d, v) with(nonresp[nonresp$date == as.Date(d) & nonresp$variable == v, ], pre_mean + estimate)
 
@@ -573,45 +594,56 @@ report_claims <- function() {
       lv("vi_vox", post13) < lv("vi_vox", 1) && lv("bestpm_abascal", post13) < lv("bestpm_abascal", 1) &&
       lv("vi_pp", post13) > lv("vi_pp", 1) && lv("bestpm_feijoo", post13) > lv("bestpm_feijoo", 1) &&
       lv("vi_psoe", post13) > lv("vi_psoe", 1),
-    "13 Nov", "PP gain significant in fewer than half the specifications ('less certain')",
-      n_sig_specs(d13, "vi_pp") < n_specs / 2,
-    "13 Nov", "PSOE gain: p < .05 in the main specification but q >= .05",
-      p(d13, "vi_psoe") < 0.05 && q(d13, "vi_psoe") >= 0.05,
+    "13 Nov", "PP and PSOE gains just short of significance (.05 <= p < .1) and significant in fewer than half the specifications",
+      near_sig(d13, "vi_pp") && near_sig(d13, "vi_psoe"),
+    "13 Nov", "Vox and Abascal falls: the two lowest p-values of all event-day estimates ('clearest result'), but q >= 0.1 ('no longer conclusive')",
+      setequal(paste(out_p$date[1:2], out_p$outcome[1:2]), paste(d13, c("vi_vox", "bestpm_abascal"))) &&
+      min(q13$q.value) >= 0.1,
+    "13 Nov", "With the pre-election survey in the pre-period, the Vox fall remains significant but smaller",
+      p(d13, "vi_vox", "with_preelectoral") < 0.05 && abs(e(d13, "vi_vox", "with_preelectoral")) < abs(e(d13, "vi_vox")),
     "13 Nov", "Sánchez as best PM: rise within the margin of error (p >= .05)",
       e(d13, "bestpm_sanchez") > 0 && p(d13, "bestpm_sanchez") >= 0.05,
-    "Detailed results", "Vox and Abascal are the only 13 Nov outcomes with q < 0.1 ('q close to 0.05')",
-      setequal(q13$outcome[q13$q.value < 0.1], c("vi_vox", "bestpm_abascal")),
+    "Detailed results", "Vox and Abascal have the lowest q-values on 13 Nov, and neither is below 0.1",
+      setequal(arrange(q13, q.value)$outcome[1:2], c("vi_vox", "bestpm_abascal")) && min(q13$q.value) >= 0.1,
     "13 Nov (who moved)", "PP 2023 voters: loyalty to PP up, switching to Vox down; Vox 2023 voters as loyal as before (< 3 points)",
       flow("PP", "PP") > 0 && flow("PP", "Vox") < 0 && abs(flow("Vox", "Vox")) < 3,
-    "Summary; 13 Nov", "Vox falls more among men aged 18-34 than overall",
-      het_in("H2", "vi_vox") < e(d13, "vi_vox"),
+    "Summary; 13 Nov", "Vox falls more among men aged 18-34 than overall, but not significantly ('imprecise')",
+      het_in("H2", "vi_vox") < e(d13, "vi_vox") && het_p("H2", "vi_vox") >= 0.05,
     "Heterogeneity", "Young men's Vox fall is concentrated in block 4 (lowest post block)",
       post13[which.min(vox_ym)] == 4,
     "13 Nov; Diagnostics", "Block 1 vs pre-election survey: Vox slightly higher, not significant",
       with(prestab[prestab$outcome == "vi_vox", ], estimate > 0 && p.value >= 0.05),
     "A stable campaign", "Vox lowest in block 4 and below its block 1 level in every later block",
       which.min(sh("vi_vox")) == which(trk_blocks == 4) && all(sh("vi_vox")[as.character(post13)] < share("vi_vox", 1)),
+    "A stable campaign", "Vox climbs back in block 7 to within 1.5 points of block 1 ('close to where it started'), then falls in block 8",
+      share("vi_vox", 7) > share("vi_vox", 6) && share("vi_vox", 1) - share("vi_vox", 7) < 1.5 &&
+      share("vi_vox", 8) < share("vi_vox", 7),
     "A stable campaign", "PSOE reaches its highest figure in block 6",
       names(which.max(sh("vi_psoe"))) == "6",
     "A stable campaign", "Frente Amplio and Podemos stay within the margin of error (range < 3.5 points)",
       diff(range(sh("vi_fa"))) < 3.5 && diff(range(sh("vi_podemos"))) < 3.5,
     "Strike", "Among 2023 PSOE/Sumar voters, Frente Amplio and Podemos change by less than one point and the PSOE does not lose ground",
       abs(het_in("H1", "vi_fa")) < 0.01 && abs(het_in("H1", "vi_podemos")) < 0.01 && het_in("H1", "vi_psoe") >= 0,
-    "Hernani", "14 Nov: PP higher than before but not significant",
-      e(d14, "vi_pp") > 0 && p(d14, "vi_pp") >= 0.05,
-    "15 Nov", "15 Nov: PSOE up and Vox down, neither significant after multiple-comparison correction",
-      e(d15, "vi_psoe") > 0 && e(d15, "vi_vox") < 0 && q(d15, "vi_psoe") >= 0.05 && q(d15, "vi_vox") >= 0.05,
+    "Hernani", "14 Nov: PP higher than before, significant in the main specification but not after correction",
+      e(d14, "vi_pp") > 0 && p(d14, "vi_pp") < 0.05 && q(d14, "vi_pp") >= 0.05,
+    "Summary; 15 Nov", "15 Nov: PSOE up and Vox down, neither significant even before correction",
+      e(d15, "vi_psoe") > 0 && e(d15, "vi_vox") < 0 && p(d15, "vi_psoe") >= 0.05 && p(d15, "vi_vox") >= 0.05,
+    "Summary; 16-17 Nov", "16 and 17 Nov: no main outcome changes significantly; Vox and Abascal lower after 17 Nov",
+      none_sig(d16) && none_sig(d17) && e(d17, "vi_vox") < 0 && e(d17, "bestpm_abascal") < 0,
+    "How to read (last paragraph)", "18 and 19 Nov (podcast, debate, Puigdemont, Ceuta report) have no later block yet",
+      all(as.Date(c("2026-11-18", "2026-11-19")) %in% days_without_post()),
     "Summary; How to read", "Daily polls detect changes of about four or five points (MDE for Vox, 13-14 Nov)",
       all(between(c(mde(d13), mde(d14)), 3.5, 5.5)),
     "Diagnostics", "No joint balance test is significant; all 13 Nov standardised differences < 0.1",
       all(balance$joint_p >= 0.05) && all(abs(balance$std_diff[balance$date == as.Date(d13)]) < 0.1),
-    "Diagnostics", "No placebo test is significant ('none of the placebo tests')",
-      n_placebo_sig == 0,
+    "Diagnostics", "A few placebo tests significant at 5% ('about as many as chance'), none after correction",
+      n_placebo_sig >= 1 && n_placebo_sig <= 2 * 0.05 * n_placebo && all(plc_q >= 0.05),
     "Diagnostics", "Recall-vote composition does not vary across blocks",
       comp_p >= 0.05,
-    "Diagnostics", "Refusals stable; DK on turnout rises to about 2-3% after 13 and 14 Nov",
+    "Diagnostics", "Refusals stable; DK on turnout rises to about 2% after 13 and 14 Nov, not significantly",
       all(nonresp$p.value[nonresp$variable == "nr_vote"] >= 0.05) &&
-      all(between(c(nr_post(d13, "dk_turnout"), nr_post(d14, "dk_turnout")), 0.015, 0.035)),
+      all(between(c(nr_post(d13, "dk_turnout"), nr_post(d14, "dk_turnout")), 0.015, 0.025)) &&
+      all(nonresp$p.value[nonresp$variable == "dk_turnout" & nonresp$date %in% as.Date(c(d13, d14))] >= 0.05),
     "Diagnostics", "No omnibus test survives multiple-comparison correction",
       omni_min_q >= 0.05,
     "Data", "Duplicate share grows over time (block 1 below every block from block 3)",
